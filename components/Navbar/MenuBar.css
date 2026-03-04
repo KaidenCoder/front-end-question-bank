@@ -1,0 +1,13 @@
+.navbar__body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.center {
+    flex: 1;
+    justify-content: center;
+    display: flex;
+}
+
