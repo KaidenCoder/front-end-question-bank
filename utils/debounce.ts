@@ -1,12 +1,20 @@
 export function debounce<T extends (...args: any[]) => void>(
     callback: T,
     delay: number
-  ){
+  ) {
     let timerId: ReturnType<typeof setTimeout>;
-    return function(this: ThisParameterType<T>, ...args: any[]){
-        clearTimeout(timerId);
-        timerId = setTimeout(() => {
-            callback.apply(this, args);
-        }, delay)
+  
+    function debounced(this: ThisParameterType<T>, ...args: Parameters<T>) {
+      clearTimeout(timerId);
+  
+      timerId = setTimeout(() => {
+        callback.apply(this, args);
+      }, delay);
     }
-}
+
+    debounced.cancel = () => {
+      clearTimeout(timerId);
+    };
+  
+    return debounced as T & { cancel: () => void };
+  }

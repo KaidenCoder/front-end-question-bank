@@ -1,25 +1,50 @@
+"use client";
+
 import { debounce } from "@/utils/debounce";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import { fetchData } from "../apis/productsQuestions";
+import styles from "./SearchBar.module.css";
 
 type SearchBarProps = {
-    searchValue: string;
-    setSearchValue: React.Dispatch<React.SetStateAction<string>>;
-}
+  searchValue: string;
+  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+};
 
-export default function SearchBar({searchValue, setSearchValue}: SearchBarProps) {
-    const debounceChange = useMemo(()=> debounce((val) => {
-        fetchData(val);
-    }, 2000), [])
+export default function SearchBar({
+  searchValue,
+  setSearchValue,
+}: SearchBarProps) {
 
-    const handleChange = useCallback((e: any) => {
-        setSearchValue(e.target.value)
-        debounceChange(e.target.value)
-    }, [debounceChange])
+  const debounceChange = useMemo(() => {
+    return debounce((val: string) => {
+      fetchData(val);
+    }, 2000);
+  }, []);
 
-    return (
-        <div>
-            <input value={searchValue} onChange={handleChange}/>
-        </div>
-    )
+  useEffect(() => {
+    return () => {
+      debounceChange.cancel();
+    };
+  }, [debounceChange]);
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      setSearchValue(value);
+      debounceChange(value);
+    },
+    [debounceChange, setSearchValue]
+  );
+
+  return (
+    <div className={styles.searchContainer}>
+        <input
+        className={styles.input}
+        value={searchValue}
+        onChange={handleChange}
+        placeholder="Search..."
+        />
+    </div>
+  );
 }
